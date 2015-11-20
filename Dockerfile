@@ -7,12 +7,11 @@ ENV CYRUS_SASL_VERSION=2.1.26 \
 
 RUN set -x \
  && mkdir -p /srv/saslauthd.d /tmp/cyrus-sasl /var/run/saslauthd \
- && apk add --update \
+ && export BUILD_DEPS=" \
         autoconf \
         automake \
-        db-dev \
         curl \
-        cyrus-sasl \
+        db-dev \
         g++ \
         gcc \
         gzip \
@@ -22,26 +21,21 @@ RUN set -x \
         openldap-dev \
         openssl-dev \
         tar \
+    " \
+ && apk add --update ${BUILD_DEPS} \
+        cyrus-sasl \
+        libldap \
 # Install tini
  && curl -fSL https://github.com/krallin/tini/releases/download/v${TINI_VERSION}/tini-static -o /bin/tini \
  && chmod +x /bin/tini \
 # Install cyrus-sasl from source
  && curl -fL ftp://ftp.cyrusimap.org/cyrus-sasl/cyrus-sasl-${CYRUS_SASL_VERSION}.tar.gz -o /tmp/cyrus-sasl.tgz \
+ && curl -fL http://git.alpinelinux.org/cgit/aports/plain/main/cyrus-sasl/cyrus-sasl-2.1.25-avoid_pic_overwrite.patch?h=3.2-stable -o /tmp/cyrus-sasl-2.1.25-avoid_pic_overwrite.patch \
+ && curl -fL http://git.alpinelinux.org/cgit/aports/plain/main/cyrus-sasl/cyrus-sasl-2.1.26-size_t.patch?h=3.2-stable -o /tmp/cyrus-sasl-2.1.26-size_t.patch \
  && tar -xzf /tmp/cyrus-sasl.tgz --strip=1 -C /tmp/cyrus-sasl \
  && cd /tmp/cyrus-sasl \
-# && sed 's/AM_CONFIG_HEADER/AC_CONFIG_HEADERS/' -i configure.in \
-# && rm -rvf \
-#        config/config.guess \
-#        config/config.sub \
-#        config/ltconfig \
-#        config/ltmain.sh \
-#        config/libtool.m4 \
-#        autom4te.cache \
-# && libtoolize -c \
-# && aclocal -I config -I cmulocal \
-# && automake -a -c \
-# && autoheader \
-# && autoconf \
+ && patch -p1 -i /tmp/cyrus-sasl-2.1.25-avoid_pic_overwrite.patch || true \
+ && patch -p1 -i /tmp/cyrus-sasl-2.1.26-size_t.patch || true \
  && ./configure \
         --prefix=/usr \
         --sysconfdir=/etc \
@@ -62,18 +56,7 @@ RUN set -x \
  && make -j1 \
  && make -j1 install \
 # Clean up build-time packages
- && apk del --purge \
-        autoconf \
-        automake \
-        curl \
-        db-dev \
-        g++ \
-        gcc \
-        gzip \
-        heimdal-dev \
-        libtool \
-        make \
-        tar \
+ && apk del --purge ${BUILD_DEPS} \
 # Clean up anything else
  && rm -fr \
     /tmp/* \

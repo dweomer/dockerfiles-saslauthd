@@ -14,7 +14,7 @@ docker run -d \
     dweomer/saslauthd -a shadow -d 1
 ```
 
-## Starting the daemon configured with the `ldap` authentication mechanism:
+## Starting the daemon configured with the (default) `ldap` authentication mechanism:
 
 ### Setup `saslauthd.conf` for an Active Directory instance running at 1.2.3.4:
 
@@ -32,7 +32,7 @@ ldap_password: <password>
 docker run -d \
     --name saslauthd \
     --volume $(pwd)/saslauthd.conf:/etc/saslauthd.conf:ro \
-    dweomer/saslauthd -a ldap -d 1
+    dweomer/saslauthd
 ```
 
 ## Verify that you can authenticate as expected:

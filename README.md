@@ -1,4 +1,4 @@
-# Cyrus SASL saslauthd on Alpine Linux
+# Cyrus SASL saslauthd on Alpine Linux [![](https://badge.imagelayers.io/dweomer/saslauthd:latest.svg)](https://imagelayers.io/?images=dweomer/saslauthd:latest 'Get your own badge on imagelayers.io')
 
 The default cyrus-sasl package for Alpine Linux didn't support LDAP so I built this image which installs it from source.
 
@@ -16,10 +16,10 @@ docker run -d \
 
 ## Starting the daemon configured with the (default) `ldap` authentication mechanism:
 
-### Setup `saslauthd.conf` for an Active Directory instance running at 1.2.3.4:
+### Setup `saslauthd.conf` for an Active Directory instance running at 10.20.30.40:
 
 ```
-ldap_servers: ldap://1.2.3.4/
+ldap_servers: ldap://10.20.30.40/
 ldap_search_base: DC=example,DC=com
 ldap_filter: (&(objectClass=Person)(sAMAccountName=%u))
 ldap_bind_dn: <Bind RDN>,ou=Service Accounts,DC=example,DC=com
